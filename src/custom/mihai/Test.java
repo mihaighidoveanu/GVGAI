@@ -33,6 +33,7 @@ public class Test {
 		// ArcadeMachine.playOneGame(game, level1, recordActionsFile, seed);
 
 		//6. This plays N games, based on their index, in the first L levels, M times each. Actions to file optional (set saveActions to true).
+        String experimentName = "test";
         int[] gamesIdx = new int[]{0, 11, 87};
         int N = gamesIdx.length, L = 2, M = 1;
 		boolean saveActions = false;
@@ -47,7 +48,7 @@ public class Test {
 				if(saveActions) for(int k = 0; k < M; ++k)
 				actionFiles[actionIdx++] = "actions_game_" + i + "_level_" + j + "_" + k + ".txt";
 			}
-			ArcadeMachine.runGames(game, levels, M, customController, saveActions? actionFiles:null);
+			ArcadeMachine.runGames(game, levels, M, customController, saveActions? actionFiles:null, experimentName);
         }
 
     }

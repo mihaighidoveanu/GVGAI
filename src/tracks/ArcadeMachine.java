@@ -20,6 +20,8 @@ import ontology.Types;
 import tools.ElapsedCpuTimer;
 import tools.StatSummary;
 
+import tools.Logger;
+
 /**
  * Created with IntelliJ IDEA. User: Diego Date: 06/11/13 Time: 11:24 This is a
  * Java port from Tom Schaul's VGDL - https://github.com/schaul/py-vgdl
@@ -391,9 +393,12 @@ public class ArcadeMachine {
      *   game, should be recorded. Accepts null if no recording is desired. If not null,
      *   this array must contain as much String objects as level_files.length*level_times.
      */
-    public static void runGames(String game_file, String[] level_files, int level_times, String agentName, String[] actionFiles) {
+    public static void runGames(String game_file, String[] level_files, int level_times, String agentName, String[] actionFiles, String metadata) {
 	VGDLFactory.GetInstance().init(); // This always first thing to do.
 	VGDLRegistry.GetInstance().init();
+
+    // set up logger
+    Logger logger = new Logger(metadata);
 
 	boolean recordActions = false;
 	if (actionFiles != null) {
@@ -525,6 +530,10 @@ public class ArcadeMachine {
 	    }
 	}
     // TODO : Log here
+    for (int i = 0; i < toPlay.no_players; i++) {
+        logger.log(game_file, victories[i].mean(), scores[i].mean(), timestamps[i]);
+    }
+    
 	System.out.println("Results in game " + game_file + ", " + vict + " , " + sc + " , " + time);
 	 	//+ " , " + performance.mean());
     }
