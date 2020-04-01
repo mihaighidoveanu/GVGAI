@@ -412,6 +412,7 @@ public class ArcadeMachine {
 	    victories[i] = new StatSummary();
 	    scores[i] = new StatSummary();
 	}
+    int [] timestamps = new int[toPlay.getNoPlayers()];
 	performance = new StatSummary();
 
 	for (String level_file : level_files) {
@@ -439,6 +440,7 @@ public class ArcadeMachine {
 		int disqCount = 0; // count how many players disqualified
 		double[] score = new double[no_players]; // store scores for all
 							 // the players
+        int timestamp = 0;
 
 		Player[] players;
 		if (no_players > 1) {
@@ -475,11 +477,13 @@ public class ArcadeMachine {
 		// Get array of scores back.
 		if ((no_players - disqCount) >= toPlay.no_players) {
 		    score = toPlay.runGame(players, randomSeed);
+            timestamp = toPlay.getGameTick();
 		    //score = toPlay.playGame(players, randomSeed, false, 0);
 		    toPlay.printResult();
 		} else {
 		    // Get the score for the result.
 		    score = toPlay.handleResult();
+            timestamp = toPlay.getGameTick();
 		    toPlay.printResult();
 		}
 
@@ -487,15 +491,18 @@ public class ArcadeMachine {
 		// down.
 		if (!ArcadeMachine.tearPlayerDown(toPlay, players, filename, randomSeed, true)) {
 		    score = toPlay.handleResult();
+            timestamp = toPlay.getGameTick();
 		    toPlay.printResult();
 		}
 
 		// Get players stats
+        
 		for (Player player : players)
 		    if (player != null) {
 			int id = player.getPlayerID();
 			scores[id].add(score[id]);
 			victories[id].add(toPlay.getWinner(id) == Types.WINNER.PLAYER_WINS ? 1 : 0);
+            timestamps[id] = timestamp;
 		    }
 
 		// reset the game.
@@ -505,16 +512,20 @@ public class ArcadeMachine {
 	    levelIdx++;
 	}
 
-	String vict = "", sc = "";
+	String vict = "", sc = "", time = "";
 	for (int i = 0; i < toPlay.no_players; i++) {
 	    vict += victories[i].mean();
 	    sc += scores[i].mean();
+        time += timestamps[i];
+        
 	    if (i != toPlay.no_players - 1) {
 		vict += ", ";
 		sc += ", ";
+        time += ", ";
 	    }
 	}
-	System.out.println("Results in game " + game_file + ", " + vict + " , " + sc);
+    // TODO : Log here
+	System.out.println("Results in game " + game_file + ", " + vict + " , " + sc + " , " + time);
 	 	//+ " , " + performance.mean());
     }
 
