@@ -59,3 +59,6 @@ clients/GVGAI-PythonClient/src/logs/clientLog.txt
 examples/super_secret
 src/META-INF/MANIFEST.MF
 src/rs/META-INF/MANIFEST.MF
+
+# logs
+**/logs/
