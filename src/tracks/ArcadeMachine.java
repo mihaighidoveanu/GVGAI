@@ -20,7 +20,7 @@ import ontology.Types;
 import tools.ElapsedCpuTimer;
 import tools.StatSummary;
 
-import tools.Logger;
+import tools.ScoreLogger;
 
 /**
  * Created with IntelliJ IDEA. User: Diego Date: 06/11/13 Time: 11:24 This is a
@@ -393,12 +393,10 @@ public class ArcadeMachine {
      *   game, should be recorded. Accepts null if no recording is desired. If not null,
      *   this array must contain as much String objects as level_files.length*level_times.
      */
-    public static void runGames(String game_file, String[] level_files, int level_times, String agentName, String[] actionFiles, String metadata) {
+    public static void runGames(String game_file, String[] level_files, int level_times, String agentName, String[] actionFiles, ScoreLogger logger) {
 	VGDLFactory.GetInstance().init(); // This always first thing to do.
 	VGDLRegistry.GetInstance().init();
 
-    // set up logger
-    Logger logger = new Logger(metadata);
 
 	boolean recordActions = false;
 	if (actionFiles != null) {
