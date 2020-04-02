@@ -18,7 +18,7 @@ public class ScoreLogger {
 
     public ScoreLogger(String outputName){
         this.outputName = outputName;
-        this.dataLines.add(new String[]{"game,win,score,time"});
+        this.dataLines.add(new String[]{"game","win","score","time"});
     }
     
     public String escapeSpecialCharacters(String data) {
