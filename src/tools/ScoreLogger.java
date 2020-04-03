@@ -50,7 +50,7 @@ public class ScoreLogger {
         assert this.outputFile.exists();
     }
 
-    public void log(String gameFile, double victory, double score, int timestamp){
+    public void log(String gameFile, double victory, double score, double timestamp){
         this.dataLines.add(new String[]{
             gameFile, String.valueOf(victory), String.valueOf(score), String.valueOf(timestamp)
         });
