@@ -394,146 +394,146 @@ public class ArcadeMachine {
      *   this array must contain as much String objects as level_files.length*level_times.
      */
     public static void runGames(String game_file, String[] level_files, int level_times, String agentName, String[] actionFiles, ScoreLogger logger) {
-	VGDLFactory.GetInstance().init(); // This always first thing to do.
-	VGDLRegistry.GetInstance().init();
+        VGDLFactory.GetInstance().init(); // This always first thing to do.
+        VGDLRegistry.GetInstance().init();
 
 
-	boolean recordActions = false;
-	if (actionFiles != null) {
-	    recordActions = true;
-	    assert actionFiles.length >= level_files.length
-		    * level_times : "runGames (actionFiles.length<level_files.length*level_times): "
-			    + "you must supply an action file for each game instance to be played, or null.";
-	}
+        boolean recordActions = false;
+        if (actionFiles != null) {
+            recordActions = true;
+            assert actionFiles.length >= level_files.length
+                * level_times : "runGames (actionFiles.length<level_files.length*level_times): "
+                    + "you must supply an action file for each game instance to be played, or null.";
+        }
 
-	Game toPlay = new VGDLParser().parseGame(game_file);
-	int levelIdx = 0;
+        Game toPlay = new VGDLParser().parseGame(game_file);
+        int levelIdx = 0;
 
-	StatSummary[] victories = new StatSummary[toPlay.getNoPlayers()];
-	StatSummary[] scores = new StatSummary[toPlay.getNoPlayers()];
-	for (int i = 0; i < toPlay.getNoPlayers(); i++) {
-	    victories[i] = new StatSummary();
-	    scores[i] = new StatSummary();
-	}
-    int [] timestamps = new int[toPlay.getNoPlayers()];
-	performance = new StatSummary();
+        StatSummary[] victories = new StatSummary[toPlay.getNoPlayers()];
+        StatSummary[] scores = new StatSummary[toPlay.getNoPlayers()];
+        for (int i = 0; i < toPlay.getNoPlayers(); i++) {
+            victories[i] = new StatSummary();
+            scores[i] = new StatSummary();
+        }
+        int [] timestamps = new int[toPlay.getNoPlayers()];
+        performance = new StatSummary();
 
-	for (String level_file : level_files) {
-	    for (int i = 0; i < level_times; ++i) {
-		if (VERBOSE)
-		    System.out.println(" ** Playing game " + game_file + ", level " + level_file + " (" + (i + 1) + "/"
-			    + level_times + ") **");
+        for (String level_file : level_files) {
+            for (int i = 0; i < level_times; ++i) {
+                if (VERBOSE)
+                    System.out.println(" ** Playing game " + game_file + ", level " + level_file + " (" + (i + 1) + "/"
+                        + level_times + ") **");
 
-		// Determine the random seed, different for each game to be
-		// played.
-		int randomSeed = new Random().nextInt();
+                // Determine the random seed, different for each game to be
+                // played.
+                int randomSeed = new Random().nextInt();
 
-		// build the level in the game.
-		toPlay.buildLevel(level_file, randomSeed);
+                // build the level in the game.
+                toPlay.buildLevel(level_file, randomSeed);
 
-		String filename = recordActions ? actionFiles[levelIdx * level_times + i] : null;
+                String filename = recordActions ? actionFiles[levelIdx * level_times + i] : null;
 
-		// Warm the game up.
-		ArcadeMachine.warmUp(toPlay, CompetitionParameters.WARMUP_TIME);
+                // Warm the game up.
+                ArcadeMachine.warmUp(toPlay, CompetitionParameters.WARMUP_TIME);
 
-		// Create the player.
-		String[] agentNames = agentName.split(" ");
-		int no_players = agentNames.length;
+                // Create the player.
+                String[] agentNames = agentName.split(" ");
+                int no_players = agentNames.length;
 
-		int disqCount = 0; // count how many players disqualified
-		double[] score = new double[no_players]; // store scores for all
-							 // the players
-        int timestamp = 0;
+                int disqCount = 0; // count how many players disqualified
+                double[] score = new double[no_players]; // store scores for all
+                                     // the players
+                int timestamp = 0;
 
-		Player[] players;
-		if (no_players > 1) {
-		    // multi player games
-		    players = new AbstractMultiPlayer[no_players];
-		} else {
-		    // single player games
-		    players = new AbstractPlayer[no_players];
-		}
+                Player[] players;
+                if (no_players > 1) {
+                    // multi player games
+                    players = new AbstractMultiPlayer[no_players];
+                } else {
+                    // single player games
+                    players = new AbstractPlayer[no_players];
+                }
 
-		for (int j = 0; j < no_players; j++) {
-		    if (no_players > 1) {
-			// multi player
-			players[j] = ArcadeMachine.createMultiPlayer(agentNames[j], filename,
-				toPlay.getObservationMulti(i), randomSeed, j, false);
-		    } else {
-			// single player
-			players[j] = ArcadeMachine.createPlayer(agentNames[j], filename, toPlay.getObservation(),
-				randomSeed, false);
-		    }
-		    score[j] = -1;
-		    if (players[j] == null) {
-				// Something went wrong in the constructor, controller
-				// disqualified
-				// toPlay.disqualify(j);
-				toPlay.getAvatars()[j].disqualify(true);
+                for (int j = 0; j < no_players; j++) {
+                    if (no_players > 1) {
+                    // multi player
+                    players[j] = ArcadeMachine.createMultiPlayer(agentNames[j], filename,
+                        toPlay.getObservationMulti(i), randomSeed, j, false);
+                    } else {
+                    // single player
+                    players[j] = ArcadeMachine.createPlayer(agentNames[j], filename, toPlay.getObservation(),
+                        randomSeed, false);
+                    }
+                    score[j] = -1;
+                    if (players[j] == null) {
+                        // Something went wrong in the constructor, controller
+                        // disqualified
+                        // toPlay.disqualify(j);
+                        toPlay.getAvatars()[j].disqualify(true);
 
-				disqCount++;
-		    }
-		}
+                        disqCount++;
+                    }
+                }
 
-		// Play the game if at least 2 players in multiplayer games or
-		// at least 1 in single player.
-		// Get array of scores back.
-		if ((no_players - disqCount) >= toPlay.no_players) {
-		    score = toPlay.runGame(players, randomSeed);
-            timestamp = toPlay.getGameTick();
-		    //score = toPlay.playGame(players, randomSeed, false, 0);
-		    toPlay.printResult();
-		} else {
-		    // Get the score for the result.
-		    score = toPlay.handleResult();
-            timestamp = toPlay.getGameTick();
-		    toPlay.printResult();
-		}
+                // Play the game if at least 2 players in multiplayer games or
+                // at least 1 in single player.
+                // Get array of scores back.
+                if ((no_players - disqCount) >= toPlay.no_players) {
+                    score = toPlay.runGame(players, randomSeed);
+                    timestamp = toPlay.getGameTick();
+                    //score = toPlay.playGame(players, randomSeed, false, 0);
+                    toPlay.printResult();
+                } else {
+                    // Get the score for the result.
+                    score = toPlay.handleResult();
+                    timestamp = toPlay.getGameTick();
+                    toPlay.printResult();
+                }
 
-		// Finally, when the game is over, we need to tear the players
-		// down.
-		if (!ArcadeMachine.tearPlayerDown(toPlay, players, filename, randomSeed, true)) {
-		    score = toPlay.handleResult();
-            timestamp = toPlay.getGameTick();
-		    toPlay.printResult();
-		}
+                // Finally, when the game is over, we need to tear the players
+                // down.
+                if (!ArcadeMachine.tearPlayerDown(toPlay, players, filename, randomSeed, true)) {
+                    score = toPlay.handleResult();
+                    timestamp = toPlay.getGameTick();
+                    toPlay.printResult();
+                }
 
-		// Get players stats
+                // Get players stats
+                
+                for (Player player : players)
+                    if (player != null) {
+                    int id = player.getPlayerID();
+                    scores[id].add(score[id]);
+                    victories[id].add(toPlay.getWinner(id) == Types.WINNER.PLAYER_WINS ? 1 : 0);
+                    timestamps[id] = timestamp;
+                    }
+
+                // reset the game.
+                toPlay.reset();
+            }
+
+            levelIdx++;
+        }
+
+        String vict = "", sc = "", time = "";
+        for (int i = 0; i < toPlay.no_players; i++) {
+            vict += victories[i].mean();
+            sc += scores[i].mean();
+            time += timestamps[i];
+            
+            if (i != toPlay.no_players - 1) {
+            vict += ", ";
+            sc += ", ";
+            time += ", ";
+            }
+        }
+        // TODO : Log here
+        for (int i = 0; i < toPlay.no_players; i++) {
+            logger.log(game_file, victories[i].mean(), scores[i].mean(), timestamps[i]);
+        }
         
-		for (Player player : players)
-		    if (player != null) {
-			int id = player.getPlayerID();
-			scores[id].add(score[id]);
-			victories[id].add(toPlay.getWinner(id) == Types.WINNER.PLAYER_WINS ? 1 : 0);
-            timestamps[id] = timestamp;
-		    }
-
-		// reset the game.
-		toPlay.reset();
-	    }
-
-	    levelIdx++;
-	}
-
-	String vict = "", sc = "", time = "";
-	for (int i = 0; i < toPlay.no_players; i++) {
-	    vict += victories[i].mean();
-	    sc += scores[i].mean();
-        time += timestamps[i];
-        
-	    if (i != toPlay.no_players - 1) {
-		vict += ", ";
-		sc += ", ";
-        time += ", ";
-	    }
-	}
-    // TODO : Log here
-    for (int i = 0; i < toPlay.no_players; i++) {
-        logger.log(game_file, victories[i].mean(), scores[i].mean(), timestamps[i]);
-    }
-    
-	System.out.println("Results in game " + game_file + ", " + vict + " , " + sc + " , " + time);
-	 	//+ " , " + performance.mean());
+        System.out.println("Results in game " + game_file + ", " + vict + " , " + sc + " , " + time);
+            //+ " , " + performance.mean());
     }
 
     /**
