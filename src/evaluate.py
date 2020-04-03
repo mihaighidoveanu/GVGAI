@@ -114,7 +114,7 @@ def main(data_dir, out_dir):
     print('Sort on Score')
     print(tables[1].mean(axis = 1).sort_values(ascending = False))
     # table = agg(table)
-    print()
+    print(tables[1])
     heatmap(tables[0])
     heatmap(tables[1], scale = True)
 
