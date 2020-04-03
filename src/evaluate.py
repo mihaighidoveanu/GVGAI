@@ -116,7 +116,7 @@ def main(data_dir, out_dir):
     # table = agg(table)
     print()
     heatmap(tables[0])
-    heatmap(tables[1], scale = False)
+    heatmap(tables[1], scale = True)
 
 import fire
 if __name__ == '__main__' :
