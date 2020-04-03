@@ -41,7 +41,7 @@ public class Test {
         //Logs to output/{experimentName}.
 
         int[] gamesIdx = new int[]{0};
-        int N = gamesIdx.length, L = 1, M = 1;
+        int N = gamesIdx.length, L = 2, M = 1;
         String experimentName = "test";
         String timeStamp = new SimpleDateFormat("MM.dd.HH.mm").format(new java.util.Date());
         String logFileName = "logs/" + experimentName + "_" + timeStamp + "_" + String.valueOf(L) + ".csv";
